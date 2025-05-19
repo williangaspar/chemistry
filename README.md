@@ -2,6 +2,13 @@
 
 Simple chemistry project
 
+## Build
+
+```
+chmod +x build.sh
+./build.sh
+```
+
 ## Usage
 
 - -c for cheminal compound
