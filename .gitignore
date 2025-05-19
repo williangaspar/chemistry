@@ -1,0 +1,28 @@
+# Ignore build artifacts
+app
+app.dSYM/
+
+# Ignore Visual Studio Code settings
+.vscode/
+
+# Ignore common C++ build files
+*.o
+*.obj
+*.exe
+*.out
+*.a
+*.so
+*.dll
+*.dylib
+
+# Ignore CMake build directory
+build/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# Ignore backup and temporary files
+*~
+*.swp
+.DS_Store
