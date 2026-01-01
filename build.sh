@@ -6,7 +6,7 @@ OUT="app"
 
 # Compile the C++ program
 g++ -std=c++17 -Wall -g $SRC -o "$OUT"
-if [ $? -ne 0 ]; then
+if [ $? -ne 0 ]; then # If $? (the exit status of the last command) is not 0, compilation failed
     echo "Compilation failed."
     exit 1
 fi

@@ -16,7 +16,7 @@ struct Element {
 
 struct PartialCompound {
   std::string symbol;
-  u_int amount;
+  int amount;
 };
 
 using element_map = std::unordered_map<std::string, Element>;
@@ -140,13 +140,9 @@ const static element_map elements = {
     {"Lv", {"Livermorium ", "Lv ", 293, 116}},
     {"Ts", {"Tennessine ", "Ts ", 294, 117}},
     {"Og", {"Oganesson ", "Og ", 294, 118}},
-    {"Uut", {"Ununtrium ", "Uut ", 289, 113}}
-    // Add more elements as needed
-};
+    {"Uut", {"Ununtrium ", "Uut ", 289, 113}}};
 
 double get_atomic_mass(const std::string& symbol);
 std::vector<PartialCompound> get_brokendown_compound(const std::string& chemical_param);
-
-// Add your declarations and definitions here
 
 }  // namespace chemistry

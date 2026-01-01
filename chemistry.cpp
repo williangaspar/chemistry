@@ -22,7 +22,8 @@ std::vector<PartialCompound> get_brokendown_compound(const std::string& chemical
 
   std::string temp_chemical;
 
-  for (auto& ch : chemical_param) {
+  for (size_t i = 0; i < chemical_param.size(); ++i) {
+    const char ch = chemical_param[i];
     if (std::isupper(ch) == true) {
       if (temp_chemical.size() > 0) {
         chemical.push_back({temp_chemical, 1});
@@ -32,9 +33,17 @@ std::vector<PartialCompound> get_brokendown_compound(const std::string& chemical
       temp_chemical += ch;
 
     } else if (std::isdigit(ch) == true) {
-      chemical.push_back({temp_chemical, 1});
+      chemical.push_back({temp_chemical, (ch - '0')});
+      const char next_ch = (i + 1 < chemical_param.size()) ? chemical_param[i + 1] : '\0';
+
+      /* If the compound have more than 99 atoms of a particular element, this code will break.
+      I don't care. Go take your monster molecule somewhere else. */
+      if (std::isdigit(next_ch) == true) {
+        chemical.back().amount = chemical.back().amount * 10 + (next_ch - '0');
+        ++i;
+      }
+
       temp_chemical.clear();
-      chemical[chemical.size() - 1].amount = ch - '0';
     } else {
       temp_chemical += ch;
     }
