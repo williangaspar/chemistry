@@ -101,7 +101,7 @@ int main(int argc, char* argv[]) {
   const auto grams_it = param.find(GRAMS_PARAM);
   if (grams_it != param.end()) {
     const double grams = std::stod(grams_it->second);
-    std::cout << "Moles of " << grams << " grams of " << compound_name
+    std::cout << grams << " grams of " << compound_name
               << " is: " << grams / mass << " moles" << std::endl;
   }
 
