@@ -82,7 +82,7 @@ int main(int argc, char* argv[]) {
 
   const double mass = get_compound_mole_mass(compound_name);
 
-  std::cout << std::fixed << std::setprecision(2);
+  std::cout << std::fixed << std::setprecision(4);
 
   if (argc == 3) {
     std::cout << "Molar mass of " << compound_name << " is: " << mass
