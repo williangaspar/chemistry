@@ -11,6 +11,8 @@
 #define CHEMICAL_PARAM "-c"
 #define MOLE_PARAM "-m"
 #define GRAMS_PARAM "-g"
+#define HELP_PARAM "-h"
+#define BALANCE_PARAM "-b"
 
 using namespace std;
 
@@ -24,6 +26,14 @@ string_map read_arguments(int argc, char* argv[]) {
   string_map param;
 
   if (argc < 3) {
+    if (argc == 2) {
+      const std::string arg = argv[1];
+      if (arg == HELP_PARAM) {
+        param[HELP_PARAM] = "";
+        return param;
+      }
+    }
+
     std::cerr << "Not enough arguments provided." << std::endl;
     exit(0);
   }
@@ -71,6 +81,17 @@ double get_compound_mole_mass(const string& compound_name) {
 int main(int argc, char* argv[]) {
   const auto param = read_arguments(argc, argv);
 
+  const auto help_it = param.find(HELP_PARAM);
+  if (help_it != param.end()) {
+    std::cout << "Usage: " << std::endl;
+    std::cout << argv[0] << " " << CHEMICAL_PARAM
+              << " <chemical_formula> [" << MOLE_PARAM
+              << " <moles>] [" << GRAMS_PARAM << " <grams>]  * for molar mass" << std::endl;
+    std::cout << argv[0] << " " << HELP_PARAM << "  * For help" << std::endl;
+    std::cout << argv[0] << " " << BALANCE_PARAM << " <equation>  * For balance an equation" << std::endl;
+    return 0;
+  }
+
   const auto compound_it = param.find(CHEMICAL_PARAM);
 
   if (compound_it == param.end()) {
@@ -91,7 +112,6 @@ int main(int argc, char* argv[]) {
   }
 
   const auto mole_it = param.find(MOLE_PARAM);
-
   if (mole_it != param.end()) {
     const double moles = std::stod(mole_it->second);
     std::cout << "Mass of " << moles << " moles of " << compound_name
@@ -103,6 +123,11 @@ int main(int argc, char* argv[]) {
     const double grams = std::stod(grams_it->second);
     std::cout << grams << " grams of " << compound_name
               << " is: " << grams / mass << " moles" << std::endl;
+  }
+
+  const auto balance_it = param.find(BALANCE_PARAM);
+  if (balance_it != param.end()) {
+    std::cout << "Chemical equation balancing is not implemented yet." << std::endl;
   }
 
   return 0;
