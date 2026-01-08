@@ -18,42 +18,74 @@ double get_atomic_mass(const std::string& symbol) {
 }
 
 std::vector<PartialCompound> get_brokendown_compound(const std::string& chemical_param) {
-  std::vector<PartialCompound> chemical;
+  // Support parentheses (and nested parentheses) using a stack of maps.
+  // Each map accumulates element counts for its level; ')' applies a multiplier to the group.
+  std::vector<std::unordered_map<std::string, int>> stack;
+  stack.emplace_back();
 
-  std::string temp_chemical;
+  size_t i = 0;
+  while (i < chemical_param.size()) {
+    char ch = chemical_param[i];
 
-  for (size_t i = 0; i < chemical_param.size(); ++i) {
-    const char ch = chemical_param[i];
-    if (std::isupper(ch) == true) {
-      if (temp_chemical.size() > 0) {
-        chemical.push_back({temp_chemical, 1});
-        temp_chemical.clear();
-      }
+    if (ch == '(') {
+      stack.emplace_back();
+      ++i;
 
-      temp_chemical += ch;
-
-    } else if (std::isdigit(ch) == true) {
-      chemical.push_back({temp_chemical, (ch - '0')});
-      const char next_ch = (i + 1 < chemical_param.size()) ? chemical_param[i + 1] : '\0';
-
-      /* If the compound have more than 99 atoms of a particular element, this code will break.
-      I don't care. Go take your monster molecule somewhere else. */
-      if (std::isdigit(next_ch) == true) {
-        chemical.back().amount = chemical.back().amount * 10 + (next_ch - '0');
+    } else if (ch == ')') {
+      // consume ')'
+      ++i;
+      // parse multiplier (if any)
+      int mul = 0;
+      while (i < chemical_param.size() && std::isdigit(static_cast<unsigned char>(chemical_param[i]))) {
+        mul = mul * 10 + (chemical_param[i] - '0');
         ++i;
       }
+      if (mul == 0) mul = 1;
 
-      temp_chemical.clear();
+      if (stack.size() < 2) {
+        throw std::runtime_error("Unmatched closing parenthesis in formula.");
+      }
+
+      auto group = std::move(stack.back());
+      stack.pop_back();
+      for (const auto& kv : group) {
+        stack.back()[kv.first] += kv.second * mul;
+      }
+
+    } else if (std::isupper(static_cast<unsigned char>(ch))) {
+      // parse element symbol (capital letter followed by zero or more lowercase letters)
+      std::string symbol;
+      symbol += ch;
+      ++i;
+      while (i < chemical_param.size() && std::islower(static_cast<unsigned char>(chemical_param[i]))) {
+        symbol += chemical_param[i++];
+      }
+
+      // parse number (if any)
+      int num = 0;
+      while (i < chemical_param.size() && std::isdigit(static_cast<unsigned char>(chemical_param[i]))) {
+        num = num * 10 + (chemical_param[i] - '0');
+        ++i;
+      }
+      if (num == 0) num = 1;
+
+      stack.back()[symbol] += num;
+
     } else {
-      temp_chemical += ch;
+      // ignore unexpected characters (e.g., whitespace)
+      ++i;
     }
   }
 
-  if (!temp_chemical.empty()) {
-    chemical.push_back({temp_chemical, 1});
+  if (stack.size() != 1) {
+    throw std::runtime_error("Unmatched opening parenthesis in formula.");
   }
 
-  return chemical;
+  std::vector<PartialCompound> result;
+  for (const auto& kv : stack.back()) {
+    result.push_back({kv.first, kv.second});
+  }
+  return result;
 }
 
 }  // namespace chemistry
